@@ -16,11 +16,11 @@
             justify-content: center;
             height: 100vh;
             overflow: hidden;
-            touch-action: none; /* Previne deslizes da tela no mobile */
+            touch-action: none;
         }
         #ui {
             margin-bottom: 10px;
-            font-size: clamp(12px, 3vw, 18px); /* Texto flexível */
+            font-size: clamp(12px, 3vw, 16px);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -28,16 +28,30 @@
             justify-content: center;
             width: 100%;
             padding: 0 5px;
+            box-sizing: border-box;
         }
+        
+        #gameContainer {
+            position: relative; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
         canvas {
             background: #22252a;
             border: 4px solid #ff4757;
             box-shadow: 0 0 30px rgba(255, 71, 87, 0.3);
             display: block;
-            max-width: 100vw; /* Ajuste automático de largura */
-            max-height: 60vh; /* Deixa espaço para os controlos */
-            object-fit: contain; /* Mantém a proporção */
+            width: 100%; 
+            height: auto;
+            aspect-ratio: 8 / 5; 
+            max-height: 65vh; 
+            box-sizing: border-box;
         }
+
         .btn-reset, .btn-menu-top {
             background: #ff4757;
             color: white;
@@ -47,6 +61,7 @@
             font-weight: bold;
             border-radius: 4px;
             transition: 0.2s;
+            font-size: clamp(10px, 2.5vw, 14px);
         }
         .btn-menu-top { background: #3b82f6; }
         .btn-reset:active { background: #e02424; }
@@ -57,24 +72,19 @@
             font-weight: bold;
         }
 
-        #gameContainer {
-            position: relative; 
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-        
+        /* --- BOTÕES POSICIONADOS NO FUNDO DA TELA --- */
         #endGameButtons {
             position: absolute;
-            top: 70%; 
+            top: auto; 
+            bottom: 6%; /* Ancora os botões ao fundo do Canvas */
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%); /* Apenas centra na horizontal */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px; 
             z-index: 9999; 
-            width: 80%;
-            max-width: 300px;
+            width: 85%;
+            max-width: 280px; 
         }
         
         .hidden { display: none !important; }
@@ -83,54 +93,50 @@
             background: #10b981; 
             color: white; 
             border: 2px solid #fff; 
-            padding: 15px 20px; 
-            font-size: 16px; 
+            padding: 12px 20px; 
+            font-size: clamp(14px, 3.5vw, 18px); 
             font-weight: bold; 
             cursor: pointer; 
             border-radius: 8px; 
             font-family: inherit; 
             text-align: center;
             transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* Dá um destaque ao botão */
         }
-        .btn-overlay:active { background: #059669; transform: scale(1.05); }
+        .btn-overlay:active { background: #059669; transform: scale(0.95); }
         .btn-blue { background: #3b82f6; }
         .btn-blue:active { background: #2563eb; }
 
-        /* --- CONTROLOS VIRTUAIS (TOUCH) --- */
         #mobileControls {
             display: flex;
             justify-content: space-between;
             width: 100%;
             max-width: 800px;
-            padding: 15px 20px;
+            padding: 10px 20px;
             box-sizing: border-box;
-            margin-top: 10px;
-            user-select: none; /* Impede seleção dupla */
+            user-select: none;
             -webkit-user-select: none;
         }
         .control-group {
             display: flex;
-            gap: 15px;
+            gap: clamp(10px, 3vw, 20px);
         }
         .touch-btn {
             background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.4);
             color: white;
-            font-size: 24px;
+            font-size: clamp(20px, 6vw, 30px);
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: clamp(50px, 15vw, 70px); 
+            height: clamp(50px, 15vw, 70px);
             display: flex;
             align-items: center;
             justify-content: center;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation; /* Reação rápida ao toque */
+            touch-action: manipulation;
         }
-        .touch-btn:active {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        /* Esconde texto no mobile, já temos botões */
+        .touch-btn:active { background: rgba(255, 255, 255, 0.5); }
         .controls-hint { display: none; } 
     </style>
 </head>
@@ -139,8 +145,8 @@
     <div id="ui">
         <span>Fase: <strong id="levelDisplay">1</strong>/11</span> |
         <span>Tempo: <span id="timerDisplay">00:00</span></span> |
-        <span>M: <span id="score">0</span></span> | 
-        <span>Rec: <span id="highscore">0</span></span>
+        <span>Moedas: <span id="score">0</span></span> | 
+        <span>Recorde: <span id="highscore">0</span></span>
         <button type="button" class="btn-reset" onclick="reiniciarJogo()">Recomeçar</button>
         <button type="button" class="btn-menu-top" onclick="voltarParaMenu()">Menu</button>
     </div>
@@ -186,20 +192,21 @@
             }
         }
 
-        // --- SISTEMA DE ÁUDIOS EXTERNOS (MP3) ---
-        let audioFinalInstancia = null;
+        let audioFinalInstancia = new Audio('final.mp3');
+        audioFinalInstancia.volume = 0.4;
+        
         let audioGameOverMp3 = new Audio('gameovertriste.mp3');
         audioGameOverMp3.loop = true; 
         audioGameOverMp3.volume = 0.6; 
 
         function voltarParaMenu() {
-            if (audioFinalInstancia) { audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; }
+            audioFinalInstancia.pause(); 
+            audioFinalInstancia.currentTime = 0;
             if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
             audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0;
             window.location.assign('index.html'); 
         }
 
-        // --- SISTEMA DE ÁUDIO DINÂMICO (SINTETIZADO) ---
         let audioCtx = null;
         let musicaIntervalo = null;
         let musicaNotasIndex = 0;
@@ -221,11 +228,7 @@
 
             if (tipo === 'megalovania') {
                 const d4 = 293.66, d5 = 587.33, a4 = 440.00, gs4 = 415.30, g4 = 392.00, f4 = 349.23, c4 = 261.63, b3 = 246.94;
-                const notasMegalovania = [
-                    d4, d4, d5, a4, gs4, g4, f4, d4, f4, g4,
-                    c4, c4, d5, a4, gs4, g4, f4, d4, f4, g4,
-                    b3, b3, d5, a4, gs4, g4, f4, d4, f4, g4
-                ];
+                const notasMegalovania = [d4, d4, d5, a4, gs4, g4, f4, d4, f4, g4, c4, c4, d5, a4, gs4, g4, f4, d4, f4, g4, b3, b3, d5, a4, gs4, g4, f4, d4, f4, g4];
                 const tempos = [110, 110, 220, 220, 220, 220, 220, 110, 110, 110];
 
                 function rodarNota() {
@@ -276,7 +279,6 @@
             }
         }
 
-        // --- NOVA FANFARRA DE VITÓRIA (NOVO RECORDE) ---
         function tocarMusicaVitoriaRecorde() {
             if (!audioCtx) return;
             const notas = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25]; 
@@ -350,8 +352,7 @@
         }
 
         function tocarSomVitoria() {
-            audioFinalInstancia = new Audio('final.mp3');
-            audioFinalInstancia.volume = 0.4;
+            audioFinalInstancia.currentTime = 0;
             audioFinalInstancia.play().catch(e => { console.log("O navegador bloqueou o áudio final.", e); });
         }
 
@@ -435,7 +436,7 @@
         function reiniciarJogo() {
             document.getElementById('endGameButtons').classList.add('hidden');
             iniciarAudioContext(); 
-            if (audioFinalInstancia) { audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; }
+            audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; 
             tipoMusicaAtual = ''; 
             if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
             audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0;
@@ -456,7 +457,6 @@
             carregarFase(faseAtual, true); 
         }
 
-        // Eventos de Teclado
         window.addEventListener('keydown', (e) => {
             iniciarAudioContext();
             iniciarInicioCronometroSeguro();
@@ -471,11 +471,10 @@
             if (e.key === 'ArrowUp') keys.up = false;
         });
 
-        // Eventos Touch (Mobile)
         function configTouchBotao(btnId, tecla) {
             const btn = document.getElementById(btnId);
             const ativar = (e) => {
-                e.preventDefault(); // Previne scroll ao tocar
+                e.preventDefault(); 
                 iniciarAudioContext();
                 iniciarInicioCronometroSeguro();
                 keys[tecla] = true;
@@ -506,15 +505,16 @@
                 let isMobile = window.innerWidth <= 600;
                 let fontSize = isMobile ? '45px' : '65px';
                 
+                // --- AJUSTE VERTICAL AQUI (Subindo todos os textos -60 e -10) ---
                 ctx.fillStyle = '#ff4757';
                 ctx.font = `bold ${fontSize} Courier New`; 
                 ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
+                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 60);
                 
                 ctx.fillStyle = '#fff'; 
                 ctx.font = isMobile ? '18px Courier New' : '24px Courier New';
                 let mensagem = causaMorte === 'lava' ? 'Você morreu queimado!' : 'Você foi eletrocutado!';
-                ctx.fillText(mensagem, canvas.width / 2, canvas.height / 2 + 10);
+                ctx.fillText(mensagem, canvas.width / 2, canvas.height / 2 - 10);
                 
                 return;
             }
@@ -528,32 +528,35 @@
                 if (isShowingRecord) {
                     let piscar = Math.floor(Date.now() / 400) % 2 === 0;
                     ctx.textAlign = 'center';
+                    
+                    // --- AJUSTE VERTICAL AQUI ---
                     ctx.font = isMobile ? '50px sans-serif' : '70px sans-serif'; 
-                    ctx.fillText('🏆', canvas.width / 2, canvas.height / 2 - 60);
+                    ctx.fillText('🏆', canvas.width / 2, canvas.height / 2 - 100);
                     
                     if (piscar) {
                         ctx.fillStyle = '#fbbf24'; 
                         ctx.font = isMobile ? 'bold 30px Courier New' : 'bold 50px Courier New';
-                        ctx.fillText('NOVO RECORDE!!!', canvas.width / 2, canvas.height / 2 + 10);
+                        ctx.fillText('NOVO RECORDE!!!', canvas.width / 2, canvas.height / 2 - 20);
                     }
                     
                     ctx.fillStyle = '#67e8f9'; 
                     ctx.font = isMobile ? 'bold 24px Courier New' : 'bold 36px Courier New';
-                    ctx.fillText(tempoFinalSalvo, canvas.width / 2, canvas.height / 2 + 70);
+                    ctx.fillText(tempoFinalSalvo, canvas.width / 2, canvas.height / 2 + 30);
                     
                 } else {
+                    // --- AJUSTE VERTICAL AQUI ---
                     ctx.fillStyle = '#10b981';
                     ctx.font = isMobile ? 'bold 35px sans-serif' : 'bold 54px sans-serif'; 
                     ctx.textAlign = 'center';
-                    ctx.fillText('VOCÊ ZEROU O JOGO!', canvas.width / 2, canvas.height / 2 - 30);
+                    ctx.fillText('VOCÊ ZEROU O JOGO!', canvas.width / 2, canvas.height / 2 - 70);
                     
                     ctx.fillStyle = '#67e8f9'; 
                     ctx.font = isMobile ? 'bold 20px sans-serif' : 'bold 28px sans-serif';
-                    ctx.fillText(`Seu tempo: ${tempoFinalSalvo}`, canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.fillText(`Seu tempo: ${tempoFinalSalvo}`, canvas.width / 2, canvas.height / 2 - 20);
                     
                     ctx.fillStyle = '#fff'; 
                     ctx.font = isMobile ? '16px sans-serif' : '20px sans-serif';
-                    ctx.fillText(`Placar Final: ${score} moedas.`, canvas.width / 2, canvas.height / 2 + 60);
+                    ctx.fillText(`Placar Final: ${score} moedas.`, canvas.width / 2, canvas.height / 2 + 20);
                 }
                 return;
             }
@@ -585,8 +588,6 @@
                         let currentBestTime = localStorage.getItem('bestTime') || "99:99";
                         let isNovoRecorde = (tempoFinalSalvo < currentBestTime || currentBestTime === "99:99");
                         
-                        salvarResultadoFinal(score, tempoFinalSalvo);
-                        
                         if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
 
                         if (isNovoRecorde) {
@@ -594,11 +595,18 @@
                             tocarMusicaVitoriaRecorde(); 
                             
                             setTimeout(() => {
+                                salvarResultadoFinal(score, tempoFinalSalvo);
+                            }, 50);
+                            
+                            setTimeout(() => {
                                 isShowingRecord = false;
                                 tocarSomVitoria(); 
                                 document.getElementById('endGameButtons').classList.remove('hidden');
                             }, 3500);
                         } else {
+                            setTimeout(() => {
+                                salvarResultadoFinal(score, tempoFinalSalvo);
+                            }, 50);
                             tocarSomVitoria();
                             document.getElementById('endGameButtons').classList.remove('hidden');
                         }
