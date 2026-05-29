@@ -32,9 +32,8 @@
         }
         
         #gameContainer {
-            position: relative; 
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             width: 100%;
             max-width: 800px;
@@ -43,12 +42,11 @@
         canvas {
             background: #22252a;
             border: 4px solid #ff4757;
-            box-shadow: 0 0 30px rgba(255, 71, 87, 0.3);
             display: block;
             width: 100%; 
             height: auto;
             aspect-ratio: 8 / 5; 
-            max-height: 65vh; 
+            max-height: 55vh; 
             box-sizing: border-box;
         }
 
@@ -72,41 +70,6 @@
             font-weight: bold;
         }
 
-        /* --- BOTÕES POSICIONADOS NO FUNDO DA TELA --- */
-        #endGameButtons {
-            position: absolute;
-            top: auto; 
-            bottom: 6%; /* Ancora os botões ao fundo do Canvas */
-            left: 50%;
-            transform: translateX(-50%); /* Apenas centra na horizontal */
-            display: flex;
-            flex-direction: column;
-            gap: 12px; 
-            z-index: 9999; 
-            width: 85%;
-            max-width: 280px; 
-        }
-        
-        .hidden { display: none !important; }
-        
-        .btn-overlay {
-            background: #10b981; 
-            color: white; 
-            border: 2px solid #fff; 
-            padding: 12px 20px; 
-            font-size: clamp(14px, 3.5vw, 18px); 
-            font-weight: bold; 
-            cursor: pointer; 
-            border-radius: 8px; 
-            font-family: inherit; 
-            text-align: center;
-            transition: 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* Dá um destaque ao botão */
-        }
-        .btn-overlay:active { background: #059669; transform: scale(0.95); }
-        .btn-blue { background: #3b82f6; }
-        .btn-blue:active { background: #2563eb; }
-
         #mobileControls {
             display: flex;
             justify-content: space-between;
@@ -116,6 +79,7 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            margin-top: 10px;
         }
         .control-group {
             display: flex;
@@ -127,8 +91,8 @@
             color: white;
             font-size: clamp(20px, 6vw, 30px);
             border-radius: 50%;
-            width: clamp(50px, 15vw, 70px); 
-            height: clamp(50px, 15vw, 70px);
+            width: clamp(50px, 15vw, 65px); 
+            height: clamp(50px, 15vw, 65px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -137,7 +101,81 @@
             touch-action: manipulation;
         }
         .touch-btn:active { background: rgba(255, 255, 255, 0.5); }
-        .controls-hint { display: none; } 
+        
+        .hidden { display: none !important; }
+
+        /* TELAS GIGANTES DE GAME OVER E VITÓRIA */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.93);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .giant-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(50px, 15vw, 130px); 
+            margin: 0 0 20px 0;
+            line-height: 1;
+        }
+        
+        .text-red { color: #ff4757; text-shadow: 0 0 30px rgba(255, 71, 87, 0.8); }
+        .text-green { color: #10b981; text-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
+        .text-gold { color: #fbbf24; text-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+        
+        /* EFEITO PISCAR NÉON PARA O RECORDE */
+        @keyframes piscarNeon {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .piscar-efeito {
+            animation: piscarNeon 0.5s infinite;
+        }
+
+        .sub-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(20px, 5vw, 40px);
+            margin: 5px 0;
+            color: #fff;
+        }
+        .text-cyan { color: #67e8f9; font-weight: bold; }
+        
+        .trophy-emoji {
+            font-size: clamp(80px, 20vw, 150px);
+            margin-bottom: -10px;
+        }
+
+        .overlay-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            margin-top: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .btn-overlay {
+            background: #10b981; 
+            color: white; 
+            border: 3px solid #fff; 
+            padding: 15px 10px; 
+            font-size: clamp(14px, 4vw, 20px); 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            flex: 1;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+        .btn-overlay:active { background: #059669; transform: scale(0.95); }
+        .btn-blue { background: #3b82f6; }
+        .btn-blue:active { background: #2563eb; }
     </style>
 </head>
 <body>
@@ -152,12 +190,7 @@
     </div>
 
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-        
-        <div id="endGameButtons" class="hidden">
-            <button class="btn-overlay" onclick="reiniciarJogo()">JOGAR NOVAMENTE</button>
-            <button class="btn-overlay btn-blue" onclick="voltarParaMenu()">VOLTAR AO MENU</button>
-        </div>
+        <canvas id="gameCanvas"></canvas>
     </div>
 
     <div id="mobileControls">
@@ -170,9 +203,39 @@
         </div>
     </div>
 
+    <div id="gameOverScreen" class="fullscreen-overlay hidden">
+        <h1 class="giant-title text-red">GAME OVER</h1>
+        <p id="deathReason" class="sub-text">Você morreu!</p>
+        <div class="overlay-buttons">
+            <button class="btn-overlay" onclick="reiniciarJogo()">JOGAR NOVAMENTE</button>
+            <button class="btn-overlay btn-blue" onclick="voltarParaMenu()">VOLTAR AO MENU</button>
+        </div>
+    </div>
+
+    <div id="victoryScreen" class="fullscreen-overlay hidden">
+        <div id="trophyIcon" class="trophy-emoji hidden">🏆</div>
+        <h1 id="victoryTitle" class="giant-title text-green">VOCÊ ZEROU!</h1>
+        <p id="victoryTime" class="sub-text text-cyan">Tempo: 00:00</p>
+        <p id="victoryScore" class="sub-text">Moedas: 0</p>
+        <div class="overlay-buttons">
+            <button class="btn-overlay" onclick="reiniciarJogo()">JOGAR NOVAMENTE</button>
+            <button class="btn-overlay btn-blue" onclick="voltarParaMenu()">VOLTAR AO MENU</button>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        const GAME_WIDTH = 800;
+        const GAME_HEIGHT = 500;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = GAME_WIDTH * dpr;
+        canvas.height = GAME_HEIGHT * dpr;
+        ctx.scale(dpr, dpr);
+
+        const dotImg = new Image();
+        dotImg.src = 'dot.png';
 
         let recordeScore = parseInt(localStorage.getItem('bestScore')) || 0;
         document.getElementById('highscore').innerText = recordeScore;
@@ -183,7 +246,6 @@
                 localStorage.setItem('bestScore', finalScore);
                 document.getElementById('highscore').innerText = finalScore; 
             }
-
             if (finalTime) {
                 let currentBestTime = localStorage.getItem('bestTime') || "99:99";
                 if (finalTime < currentBestTime || currentBestTime === "99:99") {
@@ -194,16 +256,13 @@
 
         let audioFinalInstancia = new Audio('final.mp3');
         audioFinalInstancia.volume = 0.4;
-        
         let audioGameOverMp3 = new Audio('gameovertriste.mp3');
-        audioGameOverMp3.loop = true; 
-        audioGameOverMp3.volume = 0.6; 
+        audioGameOverMp3.loop = true; audioGameOverMp3.volume = 0.6; 
 
         function voltarParaMenu() {
-            audioFinalInstancia.pause(); 
-            audioFinalInstancia.currentTime = 0;
+            try { audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; } catch(e){}
+            try { audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0; } catch(e){}
             if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
-            audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0;
             window.location.assign('index.html'); 
         }
 
@@ -221,60 +280,44 @@
 
         function iniciarMusica(tipo) {
             if (tipoMusicaAtual === tipo) return; 
-            tipoMusicaAtual = tipo;
-            musicaNotasIndex = 0;
-            
+            tipoMusicaAtual = tipo; musicaNotasIndex = 0;
             if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
 
             if (tipo === 'megalovania') {
                 const d4 = 293.66, d5 = 587.33, a4 = 440.00, gs4 = 415.30, g4 = 392.00, f4 = 349.23, c4 = 261.63, b3 = 246.94;
                 const notasMegalovania = [d4, d4, d5, a4, gs4, g4, f4, d4, f4, g4, c4, c4, d5, a4, gs4, g4, f4, d4, f4, g4, b3, b3, d5, a4, gs4, g4, f4, d4, f4, g4];
                 const tempos = [110, 110, 220, 220, 220, 220, 220, 110, 110, 110];
-
                 function rodarNota() {
-                    if (gameOver || victory || !audioCtx || tipoMusicaAtual !== 'megalovania') return;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+                    if (!isRunning || !audioCtx || tipoMusicaAtual !== 'megalovania') return;
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                     osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.type = 'sawtooth'; 
-                    let idx = musicaNotasIndex % notasMegalovania.length;
+                    osc.type = 'sawtooth'; let idx = musicaNotasIndex % notasMegalovania.length;
                     osc.frequency.setValueAtTime(notasMegalovania[idx], audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.05, audioCtx.currentTime); 
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
                     osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-                    musicaNotasIndex++;
-                    musicaIntervalo = setTimeout(rodarNota, tempos[idx % tempos.length]);
+                    musicaNotasIndex++; musicaIntervalo = setTimeout(rodarNota, tempos[idx % tempos.length]);
                 }
                 rodarNota();
-
             } else if (tipo === 'drama') {
                 const notasDrama = [261.63, 277.18]; 
                 musicaIntervalo = setInterval(() => {
-                    if (gameOver || victory || !audioCtx) return;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+                    if (!isRunning || !audioCtx) return;
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                     osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.type = 'sawtooth'; 
-                    osc.frequency.setValueAtTime(notasDrama[musicaNotasIndex % notasDrama.length], audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.07, audioCtx.currentTime); 
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-                    musicaNotasIndex++;
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(notasDrama[musicaNotasIndex % notasDrama.length], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.07, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.15); musicaNotasIndex++;
                 }, 140); 
-
             } else {
                 const melodiaNormal = [220, 233, 261, 233, 220, 196, 220, 165]; 
                 musicaIntervalo = setInterval(() => {
-                    if (gameOver || victory || !audioCtx) return;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+                    if (!isRunning || !audioCtx) return;
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                     osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.type = 'square'; 
-                    osc.frequency.setValueAtTime(melodiaNormal[musicaNotasIndex % melodiaNormal.length], audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime); 
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-                    musicaNotasIndex++;
+                    osc.type = 'square'; osc.frequency.setValueAtTime(melodiaNormal[musicaNotasIndex % melodiaNormal.length], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.4); musicaNotasIndex++;
                 }, 400);
             }
         }
@@ -282,79 +325,58 @@
         function tocarMusicaVitoriaRecorde() {
             if (!audioCtx) return;
             const notas = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25]; 
-            const tempos = [0, 0.15, 0.3, 0.45, 0.6, 0.75]; 
-            const duracoes = [0.1, 0.1, 0.1, 0.1, 0.1, 0.6]; 
-
+            const tempos = [0, 0.15, 0.3, 0.45, 0.6, 0.75]; const duracoes = [0.1, 0.1, 0.1, 0.1, 0.1, 0.6]; 
             notas.forEach((nota, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'square'; 
-                osc.frequency.setValueAtTime(nota, audioCtx.currentTime + tempos[i]);
+                osc.type = 'square'; osc.frequency.setValueAtTime(nota, audioCtx.currentTime + tempos[i]);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime + tempos[i]);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + tempos[i] + duracoes[i]);
-                osc.start(audioCtx.currentTime + tempos[i]);
-                osc.stop(audioCtx.currentTime + tempos[i] + duracoes[i] + 0.1);
+                osc.start(audioCtx.currentTime + tempos[i]); osc.stop(audioCtx.currentTime + tempos[i] + duracoes[i] + 0.1);
             });
         }
 
         function tocarSomLava() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
             osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.8); 
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
             osc.start(); osc.stop(audioCtx.currentTime + 0.8);
         }
 
         function tocarSomRaio() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
             osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
             osc.start(); osc.stop(audioCtx.currentTime + 0.6);
         }
 
         function tocarSomTrovao() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.4);
-            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
             osc.start(); osc.stop(audioCtx.currentTime + 0.4);
         }
 
         function tocarSomMoeda() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
             osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-            osc.type = 'square';
-            const agora = audioCtx.currentTime;
-            osc.frequency.setValueAtTime(523.25, agora);
-            osc.frequency.setValueAtTime(880.00, agora + 0.08);
-            gainNode.gain.setValueAtTime(0.12, agora);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, agora + 0.25);
+            osc.type = 'square'; const agora = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(523.25, agora); osc.frequency.setValueAtTime(880.00, agora + 0.08);
+            gainNode.gain.setValueAtTime(0.12, agora); gainNode.gain.exponentialRampToValueAtTime(0.01, agora + 0.25);
             osc.start(agora); osc.stop(agora + 0.25);
         }
 
-        function tocarSomVitoria() {
-            audioFinalInstancia.currentTime = 0;
-            audioFinalInstancia.play().catch(e => { console.log("O navegador bloqueou o áudio final.", e); });
-        }
+        function tocarSomVitoria() { try { audioFinalInstancia.currentTime = 0; audioFinalInstancia.play().catch(e=>{}); } catch(e) {} }
 
         const fases = [
             { playerStart: { x: 100, y: 350 }, redDot: { x: -1000, y: -1000, radius: 0 }, platColor: '#4b5563', platforms: [ { x: 0, y: 480, width: 800, height: 20 }, { x: 80, y: 390, width: 150, height: 15 }, { x: 300, y: 320, width: 180, height: 15 }, { x: 550, y: 250, width: 150, height: 15 }, { x: 250, y: 160, width: 150, height: 15 }, { x: 50, y: 220, width: 120, height: 15 }, { x: 480, y: 100, width: 200, height: 15 } ], coins: [{ x: 150, y: 350 }, { x: 380, y: 280 }, { x: 620, y: 210 }, { x: 100, y: 180 }, { x: 300, y: 120 }, { x: 580, y: 60 }] },
@@ -371,365 +393,226 @@
         ];
 
         const gravity = 0.4;
-        let score = 0;
-        let gameOver = false;
-        let victory = false;
-        let faseAtual = 0;
-        let causaMorte = ''; 
-        
-        let tempoInicial = 0;
-        let tempoDecorridoStr = "00:00";
-        let tempoFinalSalvo = ""; 
-        let cronometroRodando = false;
-        
-        let isShowingRecord = false; 
-
+        let score = 0; let faseAtual = 0;
+        let tempoInicial = 0; let tempoDecorridoStr = "00:00";
+        let cronometroRodando = false; let cronometroTimeout = null; 
+        let isRunning = true; 
         const keys = { right: false, left: false, up: false };
 
-        let player = { width: 30, height: 40, speed: 5, velX: 0, velY: 0, grounded: false };
+        let player = { width: 35, height: 45, speed: 5, velX: 0, velY: 0, grounded: false };
         let lava = { y: 500, speed: 0.5 };
-        let lavaParticles = []; 
-        let redDot, platforms, coins, corAtualPlataforma;
-
-        let pingosChuva = [];
-        let raiosAtivos = []; 
+        let lavaParticles = []; let redDot, platforms, coins, corAtualPlataforma;
+        let pingosChuva = []; let raiosAtivos = []; 
 
         function iniciarInicioCronometroSeguro() {
-            if (!cronometroRodando && !gameOver && !victory) {
-                tempoInicial = Date.now();
-                cronometroRodando = true;
-                atualizarCronometro();
+            if (!cronometroRodando && isRunning) {
+                tempoInicial = Date.now(); cronometroRodando = true; atualizarCronometro();
             }
         }
 
         function atualizarCronometro() {
-            if (gameOver || victory || !cronometroRodando) return;
+            if (!cronometroRodando) return;
             let tempoAtual = Date.now();
             let diferencaSegundos = Math.floor((tempoAtual - tempoInicial) / 1000);
-            let minutos = Math.floor(diferencaSegundos / 60);
-            let segundos = diferencaSegundos % 60;
+            let minutos = Math.floor(diferencaSegundos / 60); let segundos = diferencaSegundos % 60;
             tempoDecorridoStr = (minutos < 10 ? "0" + minutos : minutos) + ":" + (segundos < 10 ? "0" + segundos : segundos);
             document.getElementById('timerDisplay').innerText = tempoDecorridoStr;
-            setTimeout(atualizarCronometro, 1000);
+            if (cronometroTimeout) clearTimeout(cronometroTimeout);
+            cronometroTimeout = setTimeout(atualizarCronometro, 1000);
         }
 
         function carregarFase(index, resetLava = false) {
             let dadosFase = fases[index];
-            player.x = dadosFase.playerStart.x;
-            player.y = dadosFase.playerStart.y;
-            player.velX = 0;
-            player.velY = 0;
-            
-            redDot = { ...dadosFase.redDot };
-            corAtualPlataforma = dadosFase.platColor;
+            player.x = dadosFase.playerStart.x; player.y = dadosFase.playerStart.y; player.velX = 0; player.velY = 0;
+            redDot = { ...dadosFase.redDot }; corAtualPlataforma = dadosFase.platColor;
             platforms = JSON.parse(JSON.stringify(dadosFase.platforms));
             coins = dadosFase.coins.map(c => ({ x: c.x, y: c.y, radius: 8, collected: false }));
-            
-            if (resetLava) { lava.y = canvas.height; }
-
-            lavaParticles = [];
-            pingosChuva = [];
-            raiosAtivos = [];
+            if (resetLava) { lava.y = GAME_HEIGHT; } 
+            lavaParticles = []; pingosChuva = []; raiosAtivos = [];
             document.getElementById('levelDisplay').innerText = index + 1;
         }
 
         function reiniciarJogo() {
-            document.getElementById('endGameButtons').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('victoryScreen').classList.add('hidden');
+            document.getElementById('mobileControls').classList.remove('hidden'); 
+            
+            // Remove o efeito piscar caso estivesse a tocar de uma vitória anterior
+            document.getElementById('victoryTitle').classList.remove('piscar-efeito');
+
             iniciarAudioContext(); 
-            audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; 
+            try { audioFinalInstancia.pause(); audioFinalInstancia.currentTime = 0; } catch(e){}
             tipoMusicaAtual = ''; 
             if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
-            audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0;
+            try { audioGameOverMp3.pause(); audioGameOverMp3.currentTime = 0; } catch(e){}
 
-            score = 0;
-            faseAtual = 0;
-            gameOver = false;
-            victory = false;
-            causaMorte = ''; 
-            isShowingRecord = false;
-            document.getElementById('score').innerText = score;
+            keys.right = false; keys.left = false; keys.up = false;
+            score = 0; faseAtual = 0; document.getElementById('score').innerText = score;
             
-            tempoInicial = Date.now();
-            cronometroRodando = true;
+            tempoInicial = Date.now(); cronometroRodando = true;
             document.getElementById('timerDisplay').innerText = "00:00";
+            if (cronometroTimeout) clearTimeout(cronometroTimeout);
             atualizarCronometro();
 
             carregarFase(faseAtual, true); 
+            if (!isRunning) { isRunning = true; update(); }
         }
 
-        window.addEventListener('keydown', (e) => {
-            iniciarAudioContext();
-            iniciarInicioCronometroSeguro();
-            if (e.key === 'ArrowRight') keys.right = true;
-            if (e.key === 'ArrowLeft') keys.left = true;
-            if (e.key === 'ArrowUp') keys.up = true;
-        });
+        function finalizarJogo(vitoria, causaMorte = '') {
+            isRunning = false; cronometroRodando = false;
+            document.getElementById('mobileControls').classList.add('hidden');
 
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowRight') keys.right = false;
-            if (e.key === 'ArrowLeft') keys.left = false;
-            if (e.key === 'ArrowUp') keys.up = false;
-        });
+            if (!vitoria) {
+                if (causaMorte === 'lava') tocarSomLava(); else tocarSomRaio();
+                if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
+                try { audioGameOverMp3.play().catch(e=>{}); } catch(e){}
+                
+                // MOSTRA LOGO A TELA! Sem atrasos.
+                document.getElementById('deathReason').innerText = causaMorte === 'lava' ? 'Você morreu queimado!' : 'Você foi eletrocutado!';
+                document.getElementById('gameOverScreen').classList.remove('hidden');
+            } else {
+                let tempoFinal = tempoDecorridoStr;
+                let currentBestTime = localStorage.getItem('bestTime') || "99:99";
+                let isNovoRecorde = (tempoFinal < currentBestTime || currentBestTime === "99:99");
 
+                if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
+                setTimeout(() => { salvarResultadoFinal(score, tempoFinal); }, 50);
+
+                if (isNovoRecorde) {
+                    tocarMusicaVitoriaRecorde(); 
+                    
+                    // MOSTRA A TELA INSTANTANEAMENTE COM O EFEITO NEON A PISCAR!
+                    document.getElementById('trophyIcon').classList.remove('hidden');
+                    document.getElementById('victoryTitle').innerText = "NOVO RECORDE!!!";
+                    document.getElementById('victoryTitle').className = "giant-title text-gold piscar-efeito";
+                    document.getElementById('victoryTime').innerText = `Tempo Recorde: ${tempoFinal}`;
+                    document.getElementById('victoryScore').innerText = `Placar: ${score} moedas`;
+                    document.getElementById('victoryScreen').classList.remove('hidden');
+
+                    // A música toca, e ao fim de 3.5s o letreiro pára de piscar
+                    setTimeout(() => {
+                        tocarSomVitoria(); 
+                        document.getElementById('victoryTitle').classList.remove('piscar-efeito');
+                    }, 3500);
+
+                } else {
+                    tocarSomVitoria();
+                    // MOSTRA A TELA INSTANTANEAMENTE PARA VITÓRIA NORMAL!
+                    document.getElementById('trophyIcon').classList.add('hidden');
+                    document.getElementById('victoryTitle').innerText = "VOCÊ ZEROU!";
+                    document.getElementById('victoryTitle').className = "giant-title text-green";
+                    document.getElementById('victoryTime').innerText = `Seu tempo: ${tempoFinal}`;
+                    document.getElementById('victoryScore').innerText = `Placar: ${score} moedas`;
+                    document.getElementById('victoryScreen').classList.remove('hidden');
+                }
+            }
+        }
+
+        window.addEventListener('keydown', (e) => { iniciarAudioContext(); iniciarInicioCronometroSeguro(); if (e.key === 'ArrowRight') keys.right = true; if (e.key === 'ArrowLeft') keys.left = true; if (e.key === 'ArrowUp') keys.up = true; });
+        window.addEventListener('keyup', (e) => { if (e.key === 'ArrowRight') keys.right = false; if (e.key === 'ArrowLeft') keys.left = false; if (e.key === 'ArrowUp') keys.up = false; });
         function configTouchBotao(btnId, tecla) {
             const btn = document.getElementById(btnId);
-            const ativar = (e) => {
-                e.preventDefault(); 
-                iniciarAudioContext();
-                iniciarInicioCronometroSeguro();
-                keys[tecla] = true;
-            };
-            const desativar = (e) => {
-                e.preventDefault();
-                keys[tecla] = false;
-            };
-            btn.addEventListener('touchstart', ativar, {passive: false});
-            btn.addEventListener('mousedown', ativar);
-            btn.addEventListener('touchend', desativar, {passive: false});
-            btn.addEventListener('mouseup', desativar);
-            btn.addEventListener('mouseleave', desativar);
+            const ativar = (e) => { if(e.cancelable) e.preventDefault(); iniciarAudioContext(); iniciarInicioCronometroSeguro(); keys[tecla] = true; };
+            const desativar = (e) => { if(e.cancelable) e.preventDefault(); keys[tecla] = false; };
+            btn.addEventListener('touchstart', ativar, {passive: false}); btn.addEventListener('mousedown', ativar);
+            btn.addEventListener('touchend', desativar, {passive: false}); btn.addEventListener('mouseup', desativar); btn.addEventListener('mouseleave', desativar);
+        }
+        configTouchBotao('btnLeft', 'left'); configTouchBotao('btnRight', 'right'); configTouchBotao('btnUp', 'up');
+
+        function desenharRaioBrilhante(ctx, raio) {
+            let caminhos = []; let curY = 0, curX = raio.x; caminhos.push({x: curX, y: curY});
+            while(curY < GAME_HEIGHT) { curY += Math.random() * 40 + 20; curX += Math.random() * 50 - 25; caminhos.push({x: curX, y: curY}); }
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)'; ctx.lineWidth = 14; ctx.lineJoin = 'miter';
+            ctx.beginPath(); ctx.moveTo(caminhos[0].x, caminhos[0].y);
+            for(let i=1; i<caminhos.length; i++) { ctx.lineTo(caminhos[i].x, caminhos[i].y); } ctx.stroke();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(caminhos[0].x, caminhos[0].y);
+            for(let i=1; i<caminhos.length; i++) { ctx.lineTo(caminhos[i].x, caminhos[i].y); } ctx.stroke();
         }
 
-        configTouchBotao('btnLeft', 'left');
-        configTouchBotao('btnRight', 'right');
-        configTouchBotao('btnUp', 'up');
-
         function update() {
+            if (!isRunning) return; 
             requestAnimationFrame(update);
 
-            if (gameOver) {
-                cronometroRodando = false; 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                let isMobile = window.innerWidth <= 600;
-                let fontSize = isMobile ? '45px' : '65px';
-                
-                // --- AJUSTE VERTICAL AQUI (Subindo todos os textos -60 e -10) ---
-                ctx.fillStyle = '#ff4757';
-                ctx.font = `bold ${fontSize} Courier New`; 
-                ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 60);
-                
-                ctx.fillStyle = '#fff'; 
-                ctx.font = isMobile ? '18px Courier New' : '24px Courier New';
-                let mensagem = causaMorte === 'lava' ? 'Você morreu queimado!' : 'Você foi eletrocutado!';
-                ctx.fillText(mensagem, canvas.width / 2, canvas.height / 2 - 10);
-                
-                return;
-            }
-
-            if (victory) {
-                cronometroRodando = false; 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                let isMobile = window.innerWidth <= 600;
-
-                if (isShowingRecord) {
-                    let piscar = Math.floor(Date.now() / 400) % 2 === 0;
-                    ctx.textAlign = 'center';
-                    
-                    // --- AJUSTE VERTICAL AQUI ---
-                    ctx.font = isMobile ? '50px sans-serif' : '70px sans-serif'; 
-                    ctx.fillText('🏆', canvas.width / 2, canvas.height / 2 - 100);
-                    
-                    if (piscar) {
-                        ctx.fillStyle = '#fbbf24'; 
-                        ctx.font = isMobile ? 'bold 30px Courier New' : 'bold 50px Courier New';
-                        ctx.fillText('NOVO RECORDE!!!', canvas.width / 2, canvas.height / 2 - 20);
-                    }
-                    
-                    ctx.fillStyle = '#67e8f9'; 
-                    ctx.font = isMobile ? 'bold 24px Courier New' : 'bold 36px Courier New';
-                    ctx.fillText(tempoFinalSalvo, canvas.width / 2, canvas.height / 2 + 30);
-                    
-                } else {
-                    // --- AJUSTE VERTICAL AQUI ---
-                    ctx.fillStyle = '#10b981';
-                    ctx.font = isMobile ? 'bold 35px sans-serif' : 'bold 54px sans-serif'; 
-                    ctx.textAlign = 'center';
-                    ctx.fillText('VOCÊ ZEROU O JOGO!', canvas.width / 2, canvas.height / 2 - 70);
-                    
-                    ctx.fillStyle = '#67e8f9'; 
-                    ctx.font = isMobile ? 'bold 20px sans-serif' : 'bold 28px sans-serif';
-                    ctx.fillText(`Seu tempo: ${tempoFinalSalvo}`, canvas.width / 2, canvas.height / 2 - 20);
-                    
-                    ctx.fillStyle = '#fff'; 
-                    ctx.font = isMobile ? '16px sans-serif' : '20px sans-serif';
-                    ctx.fillText(`Placar Final: ${score} moedas.`, canvas.width / 2, canvas.height / 2 + 20);
-                }
-                return;
-            }
-
-            if (!gameOver && !victory && musicaTocando) {
-                if (lava.y < canvas.height) { iniciarMusica('drama'); } 
-                else { iniciarMusica(faseAtual >= 4 ? 'megalovania' : 'normal'); }
-            }
-
-            if (keys.right) player.velX = player.speed;
-            else if (keys.left) player.velX = -player.speed;
-            else player.velX = 0;
-
+            if (musicaTocando) { if (lava.y < GAME_HEIGHT) { iniciarMusica('drama'); } else { iniciarMusica(faseAtual >= 4 ? 'megalovania' : 'normal'); } }
+            if (keys.right) player.velX = player.speed; else if (keys.left) player.velX = -player.speed; else player.velX = 0;
             if (keys.up && player.grounded) { player.velY = -11; player.grounded = false; }
-
             player.velY += gravity; player.x += player.velX; player.y += player.velY;
 
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            if (player.x < 0) player.x = 0; if (player.x > GAME_WIDTH - player.width) player.x = GAME_WIDTH - player.width; 
             player.grounded = false;
 
             if (player.y + player.height < 0) {
-                faseAtual++;
-                if (faseAtual >= fases.length) {
-                    if (!victory) {
-                        victory = true;
-                        tempoFinalSalvo = tempoDecorridoStr; 
-                        
-                        let currentBestTime = localStorage.getItem('bestTime') || "99:99";
-                        let isNovoRecorde = (tempoFinalSalvo < currentBestTime || currentBestTime === "99:99");
-                        
-                        if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
-
-                        if (isNovoRecorde) {
-                            isShowingRecord = true;
-                            tocarMusicaVitoriaRecorde(); 
-                            
-                            setTimeout(() => {
-                                salvarResultadoFinal(score, tempoFinalSalvo);
-                            }, 50);
-                            
-                            setTimeout(() => {
-                                isShowingRecord = false;
-                                tocarSomVitoria(); 
-                                document.getElementById('endGameButtons').classList.remove('hidden');
-                            }, 3500);
-                        } else {
-                            setTimeout(() => {
-                                salvarResultadoFinal(score, tempoFinalSalvo);
-                            }, 50);
-                            tocarSomVitoria();
-                            document.getElementById('endGameButtons').classList.remove('hidden');
-                        }
-                    }
-                } else {
-                    lava.y += canvas.height; carregarFase(faseAtual, false);
-                }
-                return; 
+                faseAtual++; if (faseAtual >= fases.length) { finalizarJogo(true); } else { lava.y += GAME_HEIGHT; carregarFase(faseAtual, false); } return; 
             }
 
-            lava.y -= lava.speed;
-            lava.speed = 0.5 + (faseAtual * 0.12) + (score * 0.002); 
+            lava.y -= lava.speed; lava.speed = 0.5 + (faseAtual * 0.12) + (score * 0.002); 
 
-            if (lava.y < canvas.height + 50 && Math.random() < 0.3) { 
-                lavaParticles.push({ x: Math.random() * canvas.width, y: lava.y, size: Math.random() * 5 + 2, speed: Math.random() * 2 + 1, life: 1.0 });
-            }
-
-            lavaParticles.forEach((p, index) => {
-                p.y -= p.speed; p.life -= 0.02;
-                if (p.life <= 0) lavaParticles.splice(index, 1);
-            });
+            if (lava.y < GAME_HEIGHT + 50 && Math.random() < 0.15) { lavaParticles.push({ x: Math.random() * GAME_WIDTH, y: lava.y, size: Math.random() * 5 + 2, speed: Math.random() * 2 + 1, life: 1.0 }); }
+            lavaParticles.forEach((p, index) => { p.y -= p.speed; p.life -= 0.02; if (p.life <= 0) lavaParticles.splice(index, 1); });
 
             if (faseAtual >= 4) {
-                for (let i = 0; i < 2; i++) { pingosChuva.push({ x: Math.random() * canvas.width, y: -10, length: Math.random() * 15 + 10, speed: Math.random() * 10 + 15 }); }
-                pingosChuva.forEach((pingo, index) => {
-                    pingo.x -= pingo.speed * 0.15; pingo.y += pingo.speed;
-                    if (pingo.y > canvas.height) pingosChuva.splice(index, 1);
-                });
-
+                for (let i = 0; i < 2; i++) { pingosChuva.push({ x: Math.random() * GAME_WIDTH, y: -10, length: Math.random() * 15 + 10, speed: Math.random() * 10 + 15 }); } 
+                pingosChuva.forEach((pingo, index) => { pingo.x -= pingo.speed * 0.15; pingo.y += pingo.speed; if (pingo.y > GAME_HEIGHT) pingosChuva.splice(index, 1); });
                 if (Math.random() < 0.015 && raiosAtivos.length < 2) {
                     let alvoX = player.x + (player.width / 2) + (Math.random() * 140 - 70);
-                    if (alvoX < 20) alvoX = 20; if (alvoX > canvas.width - 20) alvoX = canvas.width - 20;
-                    raiosAtivos.push({ x: alvoX, timer: 50, estado: 'mirando' });
+                    if (alvoX < 20) alvoX = 20; if (alvoX > GAME_WIDTH - 20) alvoX = GAME_WIDTH - 20; 
+                    let caminhoRaio = []; let cY = 0, cX = alvoX; caminhoRaio.push({x: cX, y: cY});
+                    while(cY < GAME_HEIGHT) { cY += Math.random() * 40 + 20; cX += Math.random() * 50 - 25; caminhoRaio.push({x: cX, y: cY}); }
+                    raiosAtivos.push({ x: alvoX, timer: 50, estado: 'mirando', path: caminhoRaio });
                 }
-
                 for (let i = raiosAtivos.length - 1; i >= 0; i--) {
                     let raio = raiosAtivos[i]; raio.timer--;
-                    if (raio.estado === 'mirando' && raio.timer <= 0) {
-                        raio.estado = 'caindo'; raio.timer = 12; tocarSomTrovao();
-                    } else if (raio.estado === 'caindo') {
+                    if (raio.estado === 'mirando' && raio.timer <= 0) { raio.estado = 'caindo'; raio.timer = 12; tocarSomTrovao(); } 
+                    else if (raio.estado === 'caindo') {
                         let distancia = Math.abs((player.x + player.width / 2) - raio.x);
-                        if (distancia < 25) { 
-                            if (!gameOver) {
-                                tocarSomRaio(); 
-                                if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
-                                audioGameOverMp3.play().catch(e => console.log("O navegador bloqueou o áudio MP3.", e));
-                                document.getElementById('endGameButtons').classList.remove('hidden');
-                            }
-                            gameOver = true; causaMorte = 'raio'; 
-                        }
+                        if (distancia < 25) { finalizarJogo(false, 'raio'); return; }
                         if (raio.timer <= 0) raiosAtivos.splice(i, 1);
                     }
                 }
             }
 
-            platforms.forEach(plat => {
-                if (player.x < plat.x + plat.width && player.x + player.width > plat.x && player.y < plat.y + plat.height && player.y + player.height > plat.y) {
-                    if (player.velY > 0 && (player.y + player.height - player.velY) <= plat.y) {
-                        player.y = plat.y - player.height; player.velY = 0; player.grounded = true;
-                    }
-                }
-            });
-
+            platforms.forEach(plat => { if (player.x < plat.x + plat.width && player.x + player.width > plat.x && player.y < plat.y + plat.height && player.y + player.height > plat.y) { if (player.velY > 0 && (player.y + player.height - player.velY) <= plat.y) { player.y = plat.y - player.height; player.velY = 0; player.grounded = true; } } });
             coins.forEach(coin => {
                 if (!coin.collected) {
-                    let distX = Math.abs(coin.x - (player.x + player.width/2));
-                    let distY = Math.abs(coin.y - (player.y + player.height/2));
-                    if (distX < (player.width/2 + coin.radius) && distY < (player.height/2 + coin.radius)) {
-                        coin.collected = true; tocarSomMoeda(); score += 10;
-                        document.getElementById('score').innerText = score;
-                        salvarResultadoFinal(score); 
-                    }
+                    let distX = Math.abs(coin.x - (player.x + player.width/2)); let distY = Math.abs(coin.y - (player.y + player.height/2));
+                    if (distX < (player.width/2 + coin.radius) && distY < (player.height/2 + coin.radius)) { coin.collected = true; tocarSomMoeda(); score += 10; document.getElementById('score').innerText = score; salvarResultadoFinal(score); }
                 }
             });
 
-            if (player.y + player.height >= lava.y) {
-                if (!gameOver) {
-                    tocarSomLava(); 
-                    if (musicaIntervalo) { clearInterval(musicaIntervalo); clearTimeout(musicaIntervalo); }
-                    audioGameOverMp3.play().catch(e => console.log("O navegador bloqueou o áudio MP3.", e));
-                    document.getElementById('endGameButtons').classList.remove('hidden');
-                }
-                gameOver = true; causaMorte = 'lava'; 
-            }
+            if (player.y + player.height >= lava.y) { finalizarJogo(false, 'lava'); return; }
 
             let telaBranca = raiosAtivos.some(r => r.estado === 'caindo');
-            ctx.fillStyle = telaBranca ? '#f8fafc' : '#22252a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = telaBranca ? '#f8fafc' : '#22252a'; ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT); 
 
             if (faseAtual >= 4) {
-                ctx.strokeStyle = 'rgba(186, 230, 253, 0.3)';
-                ctx.lineWidth = 1; ctx.beginPath();
-                pingosChuva.forEach(p => { ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.speed * 0.15, p.y + p.length); });
-                ctx.stroke();
+                ctx.fillStyle = 'rgba(186, 230, 253, 0.4)'; pingosChuva.forEach(p => { ctx.fillRect(p.x, p.y, 2, p.length); }); 
                 raiosAtivos.forEach(raio => {
-                    if (raio.estado === 'mirando') {
-                        ctx.fillStyle = 'rgba(252, 211, 77, 0.25)'; ctx.fillRect(raio.x - 2, 0, 4, canvas.height);
-                    } else if (raio.estado === 'caindo') {
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.shadowColor = '#f59e0b'; ctx.shadowBlur = 15;
-                        ctx.beginPath(); ctx.moveTo(raio.x, 0);
-                        let curY = 0, curX = raio.x;
-                        while(curY < canvas.height) { curY += Math.random() * 40 + 20; curX += Math.random() * 50 - 25; ctx.lineTo(curX, curY); }
-                        ctx.stroke(); ctx.shadowBlur = 0;
-                    }
+                    if (raio.estado === 'mirando') { ctx.fillStyle = 'rgba(252, 211, 77, 0.3)'; ctx.fillRect(raio.x - 2, 0, 4, GAME_HEIGHT); } 
+                    else if (raio.estado === 'caindo' && raio.path) { desenharRaioBrilhante(ctx, raio); }
                 });
             }
 
             ctx.fillStyle = corAtualPlataforma; platforms.forEach(plat => ctx.fillRect(plat.x, plat.y, plat.width, plat.height));
             ctx.fillStyle = '#fbbf24'; coins.forEach(coin => { if (!coin.collected) { ctx.beginPath(); ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2); ctx.fill(); }});
+            
             if (redDot.radius > 0 && !telaBranca) {
-                ctx.fillStyle = '#ef4444'; ctx.shadowColor = '#ef4444'; ctx.shadowBlur = 15; 
-                ctx.beginPath(); ctx.arc(redDot.x, redDot.y, redDot.radius, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; 
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.4)'; ctx.beginPath(); ctx.arc(redDot.x, redDot.y, redDot.radius * 2, 0, Math.PI * 2); ctx.fill(); 
+                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(redDot.x, redDot.y, redDot.radius, 0, Math.PI * 2); ctx.fill();
             }
-            ctx.fillStyle = '#10b981'; ctx.fillRect(player.x, player.y, player.width, player.height);
-            if (lava.y < canvas.height) {
-                let lavaGradient = ctx.createLinearGradient(0, lava.y, 0, canvas.height);
+            
+            if (dotImg.complete && dotImg.naturalWidth !== 0) {
+                ctx.drawImage(dotImg, Math.floor(player.x) - 5, Math.floor(player.y) - 5, player.width + 10, player.height + 10);
+            } else {
+                ctx.fillStyle = '#10b981'; ctx.fillRect(Math.floor(player.x), Math.floor(player.y), player.width, player.height);
+            }
+            
+            if (lava.y < GAME_HEIGHT) { 
+                let lavaGradient = ctx.createLinearGradient(0, lava.y, 0, GAME_HEIGHT); 
                 lavaGradient.addColorStop(0, '#f97316'); lavaGradient.addColorStop(1, '#b91c1c'); 
-                ctx.fillStyle = lavaGradient; ctx.fillRect(0, lava.y, canvas.width, canvas.height - lava.y);
+                ctx.fillStyle = lavaGradient; ctx.fillRect(0, lava.y, GAME_WIDTH, GAME_HEIGHT - lava.y); 
             }
-            lavaParticles.forEach(p => {
-                ctx.fillStyle = `rgba(253, 186, 116, ${p.life})`;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-            });
+            lavaParticles.forEach(p => { ctx.fillStyle = `rgba(253, 186, 116, ${p.life})`; ctx.fillRect(p.x, p.y, p.size, p.size); });
         }
 
         carregarFase(faseAtual, true);

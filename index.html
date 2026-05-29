@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dot Vingador - Menu</title>
@@ -21,7 +20,7 @@
         }
         h1 { 
             color: #ff4757; 
-            font-size: clamp(40px, 10vw, 60px); /* Ajusta o título consoante o ecrã */
+            font-size: clamp(40px, 10vw, 60px); 
             text-shadow: 5px 5px #333; 
             margin-bottom: 40px;
             text-align: center;
@@ -61,24 +60,6 @@
             width: 100%;
             max-width: 320px;
         }
-
-        .btn-limpar {
-            background: #ff4757;
-            color: white;
-            border: 1px solid #fff;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-family: inherit;
-            border-radius: 5px;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn-limpar:hover, .btn-limpar:active {
-            background: #e02424;
-            transform: scale(1.05);
-        }
     </style>
 </head>
 <body>
@@ -91,9 +72,7 @@
     <div id="highscoreDisplay">
         🏆 <strong>RECORDES ATUAIS</strong> 🏆<br><br>
         Moedas: <span id="hsScore" style="color: #fbbf24;">0</span><br>
-        Melhor Tempo: <span id="hsTime" style="color: #10b981;">--:--</span><br>
-        
-        <button class="btn-limpar" onclick="limparRegistros()">LIMPAR REGISTROS</button>
+        Melhor Tempo: <span id="hsTime" style="color: #10b981;">--:--</span>
     </div>
 
     <script>
@@ -111,16 +90,6 @@
             } else {
                 atualizarDadosHighscore(); 
                 display.style.display = 'block'; 
-            }
-        }
-
-        function limparRegistros() {
-            let confirmacao = confirm("Tens a certeza que queres apagar os teus recordes? Esta ação não pode ser desfeita!");
-            if (confirmacao) {
-                localStorage.removeItem('bestScore');
-                localStorage.removeItem('bestTime');
-                atualizarDadosHighscore();
-                alert("Recordes apagados com sucesso!");
             }
         }
     </script>
